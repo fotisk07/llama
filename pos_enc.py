@@ -29,14 +29,4 @@ class PositionalEncoding(nn.Module):
     
 
 
-class Embeddings(nn.Module):
-    def __init__(self, d_model, vocab_size):
-        super(Embeddings, self).__init__()
-        self.emb = nn.Embedding(vocab_size, d_model)
-
-    def forward(self, input):
-        #input [N, seq_lenght]
-
-        input = self.emb(input)
-
-        return input
+    
