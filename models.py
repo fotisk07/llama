@@ -25,6 +25,7 @@ class Baseline(nn.Module):
     
     def generate(self, idx, lenght):
         # idx is (B, T)
+        self.eval()
         for _ in range(lenght):
             logits, loss = self.forward(idx)
             logits = logits[:, -1, :]
