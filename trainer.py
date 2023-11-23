@@ -3,11 +3,12 @@ import torch.nn as nn
 from utils import get_batches
 
 
-def train_model(model, dataset, lr, epochs, batch_size, context_window):
+def train_model(model, dataset, lr, epochs, batch_size, context_window, show_every=100):
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
 
     for i in range(epochs):
+
         ix = torch.randint(0, dataset.size(0) - context_window - 1, (batch_size,))
         xs = torch.stack([dataset[i:i+context_window] for i in ix]).long()
         ys = torch.stack([dataset[i+1:i+context_window+1] for i in ix]).long()
@@ -17,6 +18,7 @@ def train_model(model, dataset, lr, epochs, batch_size, context_window):
         logits, loss = model(xs, ys)
         loss.backward()
         optimizer.step()
-        print(f"Epoch {i} loss: {loss.item()}")
+        if i % show_every == 0:
+            print(f"Epoch {i} loss: {loss.item()}")
 
     return model
