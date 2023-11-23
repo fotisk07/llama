@@ -22,14 +22,16 @@ val = dataset[int(.8 * len(dataset)) : int(.9 * len(dataset))]
 test = dataset[int(.9 * len(dataset))]
 
 
-# Define model
-model = Baseline(vocab_size)
-
-# Train
 context_window = 10
 batch_size = 32
+
+# Define model
+model = Baseline(vocab_size, emb_size=200, head_size=10, context_window=context_window)
+
+# Train
+
 print("Training...")
-model = train_model(model, train, lr=1e-3, epochs=10, batch_size=batch_size, context_window=context_window)
+model = train_model(model, train, lr=1e-3, epochs=100, batch_size=batch_size, context_window=context_window)
 
 
 # Generate
