@@ -9,14 +9,21 @@ class Baseline(nn.Module):
         super(Baseline, self).__init__()
 
         self.emb = nn.Embedding(vocab_size, emb_size)
-        self.lm_head = nn.Linear(head_size, vocab_size)
+        
+        self.posemb = PositionalEncoding(emb_size, context_window, vocab_size=vocab_size)
 
-        self.attention = SingleHeadAttention(head_size=head_size, emb_size=emb_size, context_window=context_window)
+        self.attention = MultiSelfAttention(head_size= emb_size // 4, emb_size=emb_size, context_window=context_window, n_heads=4)
+        
+        self.lm_head = nn.Linear(emb_size, vocab_size)
+
         self.context_window = context_window    
 
 
     def forward(self, idx, targets=None):
         x = self.emb(idx) # B ,T , C
+        pos_encodings = self.posemb(x)
+
+        x = x + pos_encodings
 
         x = self.attention(x)
 
@@ -73,6 +80,12 @@ class SingleHeadAttention(nn.Module):
 
 
 
+class MultiSelfAttention(nn.Module):
+    def __init__(self, head_size, emb_size, context_window, n_heads):
+        super(MultiSelfAttention, self).__init__()
+        self.attentions = nn.ModuleList([SingleHeadAttention(head_size, emb_size, context_window) for _ in range(n_heads)])
 
+    def forward(self, x):
+        return torch.cat([att(x) for att in self.attentions], dim=-1)
 
 
